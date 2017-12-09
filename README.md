@@ -71,14 +71,12 @@ $ bbcomp destinationBranchName
 
 # By default, this function will compare current branch to 'develop'
 $ bbcomp
-# Compare in browser: [current-branch]
 ```
 
 #### Opens browser to create a pull request in Bitbucket
 ``` sh
 $ cd directory/to/current-project
 $ pr
-# PR for branch: [current-branch]
 ```
 
 
