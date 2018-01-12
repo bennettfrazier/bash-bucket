@@ -1,66 +1,79 @@
-# bash-bucket
+# bash-bucket 🌀
 Bash Bucket is a .bash_profile function set to easily open repositories, branches, and pull requests for [Mecurial](https://www.mercurial-scm.org/) and [Git](https://git-scm.com/) in the browser, all via the command line.
 
-The purpose of bash-bucket is to efficiently open up Bitbucket to:
-- open current local branch `$ bb`
-- open branch commit history `$ bbcomm`
-- open and compare branches `$ bbcomp`
-- open a pull request from current local branch `$ pr`
+The purpose of bash-bucket is to efficiently open up current branch details through the terminal window:
+- `$ bb` - open current local branch
+- `$ bbcomm` - open branch commit history
+- `$ bbcomp` - open and compare branches (default is `develop`)
+- `$ pr` - open a pull request from current local branch
 
+---------
 
 ## Installation
 
 To run these commands, simply copy these functions from the .bash_profile file to your home directory `~/`. If you already have a .bash_profile in `~/`, simply copy in in the functions you would like to use.
 
+### 1. Clone to your favorite dev directory, or download zip directly
 ```sh
-# See if .bash_profile exists in home
-$ cd ~/ | find . -name '.bash_profile'
+$ git clone https://github.com/bennettfrazier/bash-bucket.git
+```
+
+### 2. See if .bash_profile exists in home
+```sh
+$ cd ~/
+$ find . -name '.bash_profile'
 
 # If no .bash_profile exists in ./ or ~/, create an empty file
 $ touch .bash_profile
+```
 
-# Clone to your favorite dev directory, or download zip directly
-$ git clone https://github.com/bennettfrazier/bash-bucket.git
+### 3. Copy/paste .bash_profile
+```sh
+# Open .bash_profile through text editor and paste in copied functions
+$ cd ~/directory/to/cloned-repo/bash-bucket
+$ open .bash_profile # bash-bucket file
+# ✂️ Copy all text to clipboard
+$ open ~/.bash_profile # home file
+# 📑 Paste copied text in (if other functions here, leave them too)
 
+# -- OR --  
 
-# Open home .bash_profile in text editor to copy/paste in home ~/.bash_profile
-$ cd ~/directory/to/bash-bucket
-$ open /.bash_profile
-# Copy all text to clipboard
-
-# Open home .bash_profile and paste in copied functions
-$ open ~/.bash_profile
-
-# -- OR --
-
-# Terminal copy/paste method
-# Note: type commands out, copying & pasting will overwrite clipboard
-$ cd ~/directory/to/bash-bucket
+# Terminal method to copy/paste
+# Note: type out commands (copy & paste will overwrite clipboard)
+$ cd ~/directory/to/cloned-repo/bash-bucket
 $ cat .bash_profile | pbcopy
 $ pbpaste > ~/.bash_profile
 ```
-
-To run any of the functions from the updated `.bash_profile`, open a new window, or:
+### 4. Load functions into bash terminal
 ```sh
 # Load in functions in the current shell script
 $ source ~/.bash_profile
+
+# -- OR --
+
+# Just open a new Terminal window to enable commands (⌘ + T)
 ```
+Boom, now you can use all the **bash-bucket** commands! 💥
 
+All commands are fully explained below ⬇️
 
-## bash-bucket functions:
-#### Open current branch in Bitbucket
+---------
+
+## Terminal Functions
+### `$ bb`
+Open current branch in Bitbucket
 ``` sh
 $ cd directory/to/current-project
 $ bb
 ```
-
-#### Open current branch commit history in browser
+### `$ bbcomm`
+Open current branch commit history in browser
 ``` sh
 $ cd directory/to/current-project
 $ bbcomm
 ```
-
-#### Compare current branch as source to a destination branch
+### `$ bbcomp`
+Compare current branch as source to a destination branch
 ``` sh
 $ cd directory/to/current-project
 
@@ -72,13 +85,14 @@ $ bbcomp destinationBranchName
 # By default, this function will compare current branch to 'develop'
 $ bbcomp
 ```
-
-#### Opens browser to create a pull request in Bitbucket
+### `$ pr`
+Opens browser to create a pull request in Bitbucket
 ``` sh
 $ cd directory/to/current-project
 $ pr
 ```
 
+---------
 
 ### Credit/inspiration:
 - [Open Bitbucket from Bash](http://hgtip.com/tips/advanced/2009-10-08-open-Bitbucket-from-bash/) by [Steve Posh](http://stevelosh.com/)
