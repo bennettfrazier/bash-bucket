@@ -13,12 +13,12 @@ The purpose of bash-bucket is to efficiently open up current branch details thro
 
 To run these commands, simply copy these functions from the .bash_profile file to your home directory `~/`. If you already have a .bash_profile in `~/`, simply copy in in the functions you would like to use.
 
-##### 1. Clone to your favorite dev directory, or download zip directly
+### 1. Clone to your favorite dev directory, or download zip directly
 ```sh
 $ git clone https://github.com/bennettfrazier/bash-bucket.git
 ```
 
-##### 2. See if .bash_profile exists in home
+### 2. See if .bash_profile exists in home
 ```sh
 $ cd ~/
 $ find . -name '.bash_profile'
@@ -27,7 +27,7 @@ $ find . -name '.bash_profile'
 $ touch .bash_profile
 ```
 
-##### 3. Copy/paste .bash_profile
+### 3. Copy/paste .bash_profile
 ```sh
 # Open .bash_profile through text editor and paste in copied functions
 $ cd ~/directory/to/cloned-repo/bash-bucket
@@ -44,7 +44,7 @@ $ cd ~/directory/to/cloned-repo/bash-bucket
 $ cat .bash_profile | pbcopy
 $ pbpaste > ~/.bash_profile
 ```
-##### 4. Load functions into bash terminal
+### 4. Load functions into bash terminal
 ```sh
 # Load in functions in the current shell script
 $ source ~/.bash_profile
