@@ -1,5 +1,5 @@
 # bash-bucket 🌀
-Bash Bucket is a .bash_profile function set to easily open repositories, branches, and pull requests for [Mecurial](https://www.mercurial-scm.org/) and [Git](https://git-scm.com/) in the browser, all via the command line.
+Bash Bucket is a .bash_profile function set to easily open repositories, branches, and pull requests for [Mecurial](https://www.mercurial-scm.org/) and [Git](https://git-scm.com/) in the browser, all via the command line. It now also works for VCS on both [Bitbucket](http://bitbucket.org/) and Github.
 
 The purpose of bash-bucket is to efficiently open up current branch details through the terminal window:
 - `$ bb` - open current local branch
