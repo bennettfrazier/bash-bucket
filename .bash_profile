@@ -5,24 +5,30 @@
 # 2. Create Homebrew tap -> https://docs.brew.sh/How-to-Create-and-Maintain-a-Tap.html
 # 3. Rewrite docs for easier setup
 # 4. Add parameters and help
-# 5. Put variables into stored config file
-# 6. Adjust script to run via Node (look at create-react-app for reference) -> https://github.com/tj/commander.js
+# 5. Cleanup fallback issues
+# 6. Put variables into stored config file
+# 7. Adjust script to run via Node (look at create-react-app for reference) -> https://github.com/tj/commander.js
 
-# BB VCS global variables
+# Bash Bucket Settings
+BB_PRINT_PREFIX="🌀 [Bash Bucket]"
+
+# Bitbucket settings
 BB_BITBUCKET="bitbucket.org"
-BB_GITHUB="github.com"
+BB_BITBUCKET_BRANCHTYPE="branch"
+BB_BITBUCKET_DEFAULT_BRANCH="develop"
 
-# Default branch to compare/pr
-BB_DEFAULT_GITHUB="master"
-BB_DEFAULT_BITBUCKET="develop"
+# GitHub settings
+BB_GITHUB="github.com"
+BB_GITHUB_BRANCHTYPE="tree"
+BB_GITHUB_DEFAULT_BRANCH="master"
 
 function bb__repo() {
-    local VCS="";          # vcs in use
-    local P=""             # original path
-    local B=""             # branch
-    local PREFIX=""        # prefix
-    local SUFFIX=""        # suffix used based on vcs/repo
-    local REPO=""          # repo path
+    local REPO_PREFIX=""; # repo in use
+    local P=""            # original path
+    local B=""            # branch
+    local PREFIX=""       # prefix
+    local SUFFIX=""       # suffix used based on vcs/repo
+    local REPO=""         # repo path
 
     # String prefix
     local gitPrefix="git@"
@@ -38,12 +44,12 @@ function bb__repo() {
         #if has github.com
         if [ `echo $P | grep -c "$BB_GITHUB" ` -gt 0 ]
         then
-            VCS="$BB_GITHUB"
+            REPO_PREFIX="$BB_GITHUB"
         else
             # try bitbucket
             if [ `echo $P | grep -c "$BB_BITBUCKET" ` -gt 0 ]
             then
-                VCS="$BB_BITBUCKET"
+                REPO_PREFIX="$BB_BITBUCKET"
             fi
         fi
 
@@ -54,15 +60,15 @@ function bb__repo() {
         REPO=${REPO#$httpPrefix}
         REPO=${REPO#$httpsPrefix}
         REPO=${REPO#$gitPrefix}
-        PREFIX="$VCS/"
-        PREFIX2="$VCS:" #remove attempt 2
+        PREFIX="$REPO_PREFIX/"
+        PREFIX2="$REPO_PREFIX:" #remove attempt 2
 
         # strip repo prefix/suffix
         REPO=${REPO#$PREFIX}
         REPO=${REPO#$PREFIX2}
         REPO=${REPO%$SUFFIX}
 
-    # try mecurial
+    # try mecurial TODO fallback
     else
         # parameters
         P="$(hg paths 2>/dev/null )"
@@ -70,26 +76,26 @@ function bb__repo() {
         if [ `echo $P | grep -c "$BB_GITHUB" ` -gt 0 ] #if contains
         then
             # if github is contained in path
-            VCS="$BB_GITHUB"
+            REPO_PREFIX="$BB_GITHUB"
         else
             # try bitbucket
             if [ `echo $P | grep -c "$BB_BITBUCKET" ` -gt 0 ]
             then
-                VCS="$BB_BITBUCKET"
+                REPO_PREFIX="$BB_BITBUCKET"
             fi
         fi
 
         # trim and remove prefix/suffix
-        REPO="$(echo "$P" | sed -e 's|.*\('$VCS'.*\)|\1|')"
-        PREFIX="$VCS/"
-        PREFIX2="$VCS:" #remove attempt 2
+        REPO="$(echo "$P" | sed -e 's|.*\('$REPO_PREFIX'.*\)|\1|')"
+        PREFIX="$REPO_PREFIX/"
+        PREFIX2="$REPO_PREFIX:" #remove attempt 2
         SUFFIX="/"
         REPO=${REPO#$PREFIX}
         REPO=${REPO#$PREFIX2}
         REPO=${REPO%$SUFFIX}
     fi;
 
-    echo "https://$VCS/$REPO"
+    echo "https://$REPO_PREFIX/$REPO"
 }
 
 # returns the branch name dependent upon the current repository type
@@ -97,17 +103,17 @@ function bb__branch() {
     # Check for git in directory
     if [[ -d .git ]]; then
         local B="$(git rev-parse --abbrev-ref HEAD)"
-    # try mecurial
+    # try mecurial TODO fallback
     else
         local B="$(hg branch 2>/dev/null)"
     fi;
     echo $B
 }
 
-# returns the vcs name dependent upon the current repository type
-function bb__vcs() {
-    local VCS="";          # vcs in use
-    local P=""             # original path
+# returns the repo prefix dependent upon the current repository type
+function bb__repoPrefix() {
+    local REPO_PREFIX=""; # repo in use
+    local P=""            # original path
 
     # Check for git in directory
     if [[ -d .git ]]; then
@@ -116,16 +122,16 @@ function bb__vcs() {
         if [ `echo $P | grep -c "$BB_GITHUB" ` -gt 0 ] #if contains
         then
             # if github is contained in remote origin path
-            VCS="$BB_GITHUB"
+            REPO_PREFIX="$BB_GITHUB"
         else
             # try bitbucket
             if [ `echo $P | grep -c "$BB_BITBUCKET" ` -gt 0 ]
             then
-                VCS="$BB_BITBUCKET"
+                REPO_PREFIX="$BB_BITBUCKET"
             fi
         fi
 
-    # try mecurial
+    # try mecurial TODO fallback
     else
         P="$(hg paths 2>/dev/null )"
 
@@ -133,68 +139,98 @@ function bb__vcs() {
         if [ `echo $P | grep -c "$BB_GITHUB" ` -gt 0 ]
         then
             # if github is contained in path
-            VCS="$BB_GITHUB"
+            REPO_PREFIX="$BB_GITHUB"
         else
             # try bitbucket
             if [ `echo $P | grep -c "$BB_BITBUCKET" ` -gt 0 ]
             then
-                VCS="$BB_BITBUCKET"
+                REPO_PREFIX="$BB_BITBUCKET"
             fi
         fi
     fi;
 
-    echo "$VCS"
+    echo "$REPO_PREFIX"
 }
 
 
 # returns the branch type dependent upon repository type
 function bb__branchType() {
-    local VCS=$(bb__vcs)
+    local REPO_PREFIX=$(bb__repoPrefix)
 
-    if [[ "$VCS" == "github.com" ]]; then
-        echo "tree"
+    if [[ "$REPO_PREFIX" == "github.com" ]]; then
+        echo "$BB_GITHUB_BRANCHTYPE"
     else
-        echo "branch"
+        echo "$BB_BITBUCKET_BRANCHTYPE"
     fi;
 }
 
 function bb() {
-    local URL=$(bb__repo)                #result of running bb__repo function
+    local REPO=$(bb__repo)               #result of running bb__repo function
     local B=$(bb__branch)                #result of running bb__branch function
     local BRANCH_TYPE=$(bb__branchType)  #result of running bb__branchType function
-    local VCS=$(bb__vcs)                 #result of running bb__vcs function
+    local REPO_PREFIX=$(bb__repoPrefix)  #result of running bb__repoPrefix function
 
-    if [[ "$URL" == "" ]]; then
-        printf "abort: no repository or branch to open (bash-bucket)\n";
+    if [[ "$REPO" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to open\n";
     else
-        local LINK="$URL/$BRANCH_TYPE/$B"
-        printf "🌀 [Bash Bucket] Open Branch\n🌀 SRC  -------> $B\n🌀 REPO -------> $URL \n";
-        [[ -n $LINK ]] && open $LINK || echo "No $VCS path found!"
+        local LINK="$REPO/$BRANCH_TYPE/$B"
+        printf "$BB_PRINT_PREFIX Open Branch\n🌀 SRC  -------> $B\n🌀 REPO -------> $REPO \n";
+        [[ -n $LINK ]] && open $LINK || echo "No $REPO_PREFIX path found!"
     fi;
 }
 
-function bbcomm() {
-    local VCS=$(bb__vcs) #result of running bb__vcs function
+function bbsrc() {
+    local REPO=$(bb__repo)               #result of running bb__repo function
+    local REPO_PREFIX=$(bb__repoPrefix)  #result of running bb__repoPrefix function
 
-    if [[ "$VCS" == "" ]]; then
-        printf "abort: no repository or branch to get commit history (bash-bucket)\n";
+    if [[ "$REPO" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to open\n";
+    else
+        local LINK="$REPO"
+        printf "$BB_PRINT_PREFIX Open Source\n🌀 SRC  -------> $B\n🌀 REPO -------> $REPO \n";
+        [[ -n $LINK ]] && open $LINK || echo "No $REPO_PREFIX path found!"
+    fi;
+}
+
+function bbhome() {
+    local REPO=$(bb__repo)                  #result of running bb__repo function
+    local REPO_PREFIX=$(bb__repoPrefix)     #result of running bb__repoPrefix function
+
+    if [[ "$REPO_PREFIX" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to get commit history (bash-bucket)\n";
+    else
+        if [[ "$REPO_PREFIX" == "$BB_GITHUB" ]]; then
+            local LINK="$REPO"
+        elif [[ "$REPO_PREFIX" == "$BB_BITBUCKET" ]]; then
+            local BRANCH_TYPE=$(bb__branchType) #returns branch type
+            local LINK="$REPO/"
+        fi;
+        printf "$BB_PRINT_PREFIX Open Home\n🌀 REPO -------> $REPO \n";
+        [[ -n $LINK ]] && open $LINK || echo "No $REPO_PREFIX path found!"
+    fi;
+}
+
+
+function bbcomm() {
+    local REPO_PREFIX=$(bb__repoPrefix)   #result of running bb__repoPrefix function
+
+    if [[ "$REPO_PREFIX" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to get commit history (bash-bucket)\n";
     else
         # Returned function variables
-        local URL=$(bb__repo)
-        echo $URL
-
+        local REPO=$(bb__repo)
         local B=$(bb__branch)
 
-        if [[ "$VCS" == "$BB_GITHUB" ]]; then
-            local LINK="$URL/commits/$B"
+        if [[ "$REPO_PREFIX" == "$BB_GITHUB" ]]; then
+            local LINK="$REPO/commits/$B"
         else
-            if [[ "$VCS" == "$BB_BITBUCKET" ]]; then
+            if [[ "$REPO_PREFIX" == "$BB_BITBUCKET" ]]; then
                 local BRANCH_TYPE=$(bb__branchType) #returns branch type
-                local LINK="$URL/commits/$BRANCH_TYPE/$B"
+                local LINK="$REPO/commits/$BRANCH_TYPE/$B"
             fi
         fi
-        printf "🌀 [Bash Bucket] Commit History\n🌀 SRC  -------> $B\n🌀 REPO -------> $URL \n";
-        [[ -n $LINK ]] && open $LINK || echo "No $VCS path found!"
+        printf "$BB_PRINT_PREFIX Commit History\n🌀 SRC  -------> $B\n🌀 REPO -------> $REPO \n";
+        [[ -n $LINK ]] && open $LINK || echo "No $REPO_PREFIX path found!"
     fi;
 }
 
@@ -203,95 +239,89 @@ function bbcomp() {
     local LINK="";
 
     # Returned function vars
-    local URL=$(bb__repo)                #result of running bb__repo function
-    local B=$(bb__branch)                #result of running bb__branch function
-    local BRANCH_TYPE=$(bb__branchType)  #result of running bb__branchType function
-    local VCS=$(bb__vcs)                 #result of running bb__vcs function
+    local REPO=$(bb__repo)                  #result of running bb__repo function
+    local B=$(bb__branch)                   #result of running bb__branch function
+    local BRANCH_TYPE=$(bb__branchType)     #result of running bb__branchType function
+    local REPO_PREFIX=$(bb__repoPrefix)     #result of running bb__repoPrefix function
 
-    if [[ "$VCS" == "" ]]; then
-        printf "abort: no repository or branch to open (bash-bucket)\n";
+    if [[ "$REPO_PREFIX" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to open\n";
     else
-        # Check if VCS Github
-        if [[ "$VCS" == "$BB_GITHUB" ]]; then
+        # Check if REPO_PREFIX Github
+        if [[ "$REPO_PREFIX" == "$BB_GITHUB" ]]; then
 
             # Destination branch compare parameter
             if [[ "$1" == "" ]]; then
-                DEST="$BB_DEFAULT_GITHUB";
+                DEST="$BB_GITHUB_DEFAULT_BRANCH";
             else
                 DEST="$1";
             fi
 
             # End result: http://github.com/example/repo/compare/DEST...BRANCH
-            LINK="$URL/compare/$DEST...$B"
+            LINK="$REPO/compare/$DEST...$B"
 
-        else if [[ "$VCS" == "$BB_BITBUCKET" ]]; then
+        else if [[ "$REPO_PREFIX" == "$BB_BITBUCKET" ]]; then
                 # Destination branch compare parameter
                 if [[ "$1" == "" ]]; then
-                    DEST="$BB_DEFAULT_BITBUCKET";
+                    DEST="$BB_BITBUCKET_DEFAULT_BRANCH";
                 else
                     DEST="$1";
                 fi
 
                 # End result: http://bitbucket.org/example/repo/branch/BRANCH?dest=DEST#diff
-                LINK="$URL/branch/$B?dest=$DEST#diff"
+                LINK="$REPO/branch/$B?dest=$DEST#diff"
             fi
         fi
-    fi
-
-
-    if [[ "$URL" == "" ]]; then
-        printf "abort: no repository or branch to compare (bash-bucket)\n";
-    else
-        printf "🌀 [Bash Bucket] Compare Branches\n🌀 SRC  -------> $B \n🌀 DEST -------> $DEST\n🌀 REPO -------> $URL \n";
-        [[ -n $LINK ]] && open $LINK || echo "No $VCS path found!"
+        printf "$BB_PRINT_PREFIX Compare Branches\n🌀 SRC  -------> $B \n🌀 DEST -------> $DEST\n🌀 REPO -------> $REPO \n";
+        [[ -n $LINK ]] && open $LINK || echo "No $REPO_PREFIX path found!"
     fi;
 }
 
 function pr() {
-    local VCS="";
+    local REPO_PREFIX="";
     local LINK="";
 
     # Returned local vars
-    local URL=$(bb__repo)                #result of running bb__repo function
-    local B=$(bb__branch)                #result of running bb__branch function
-    local BRANCH_TYPE=$(bb__branchType)  #result of running bb__branchType function
-    local VCS=$(bb__vcs)                 #result of running bb__vcs function
+    local REPO=$(bb__repo)                 #result of running bb__repo function
+    local B=$(bb__branch)                 #result of running bb__branch function
+    local BRANCH_TYPE=$(bb__branchType)   #result of running bb__branchType function
+    local REPO_PREFIX=$(bb__repoPrefix)   #result of running bb__repoPrefix function
 
 
-    if [[ "$VCS" == "" ]]; then
-        printf "abort: no repository or branch to open (bash-bucket)\n";
+    if [[ "$REPO_PREFIX" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to open\n";
     else
-        # Check if VCS Github
-        if [[ "$VCS" == "$BB_GITHUB" ]]; then
+        # Check if REPO_PREFIX Github
+        if [[ "$REPO_PREFIX" == "$BB_GITHUB" ]]; then
 
             # Destination branch compare parameter
             if [[ "$1" == "" ]]; then
-                DEST="$BB_DEFAULT_GITHUB";
+                DEST="$BB_GITHUB_DEFAULT_BRANCH";
             else
                 DEST="$1";
             fi
 
             # End result: http://github.com/example/repo/compare/DEST...BRANCH
-            LINK="$URL/compare/$DEST...$B"
+            LINK="$REPO/compare/$DEST...$B"
 
-        else if [[ "$VCS" == "$BB_BITBUCKET" ]]; then
+        else if [[ "$REPO_PREFIX" == "$BB_BITBUCKET" ]]; then
                 # Destination branch compare parameter
                 if [[ "$1" == "" ]]; then
-                    DEST="$BB_DEFAULT_BITBUCKET";
+                    DEST="$BB_BITBUCKET_DEFAULT_BRANCH";
                 else
                     DEST="$1";
                 fi
 
                 # Bitbucket does not accept a DEST parameter to be passed for PR request
-                LINK="$URL/pull-requests/new?source=$B&t=1"
+                LINK="$REPO/pull-requests/new?source=$B&t=1"
             fi
         fi
     fi
 
-    if [[ "$URL" == "" ]]; then
-        printf "abort: no repository or branch to create a PR (bash-bucket)\n";
+    if [[ "$REPO" == "" ]]; then
+        printf "$BB_PRINT_PREFIX Abort: no repository or branch to create a PR (bash-bucket)\n";
     else
-        printf "🌀 [Bash Bucket] Pull Request\n🌀 SRC  -------> $B \n🌀 DEST -------> $DEST\n🌀 REPO -------> $URL \n";
-        [[ -n $LINK ]] && open $LINK || echo "No $VCS path found!";
+        printf "$BB_PRINT_PREFIX Pull Request\n🌀 SRC  -------> $B \n🌀 DEST -------> $DEST\n🌀 REPO -------> $REPO \n";
+        [[ -n $LINK ]] && open $LINK || echo "No $REPO_PREFIX path found!";
     fi;
 }
