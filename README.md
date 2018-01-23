@@ -95,5 +95,5 @@ $ pr
 ---------
 
 ### Credit/inspiration:
-- [Open Bitbucket from Bash](http://hgtip.com/tips/advanced/2009-10-08-open-Bitbucket-from-bash/) by [Steve Posh](http://stevelosh.com/)
+- [Open Bitbucket from Bash](http://hgtip.com/tips/advanced/2009-10-08-open-bitbucket-from-bash/) by [Steve Posh](http://stevelosh.com/)
 - [An introduction to useful bash aliases and functions](https://www.digitalocean.com/community/tutorials/an-introduction-to-useful-bash-aliases-and-functions) by Justin Ellingwood @ DigitalOcean
