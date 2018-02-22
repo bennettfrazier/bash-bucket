@@ -1,0 +1,39 @@
+{
+    "name": "bash-bucket",
+    "version": "1.0.0",
+    "description": "Open repo in the browser straight from terminal",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/bennettfrazier/bash-bucket.git"
+    },
+    "author": {
+        "name": "Bennett Frazier",
+        "email": "bfrazier@crescendocollective.com",
+        "url": "github.com/bennettfrazier"
+    },
+    "bin": {
+        "bb": "./cli.js"
+    },
+    "engines": {
+        "node": ">=4"
+    },
+    "scripts": {},
+    "files": [
+        "cli.js"
+    ],
+    "keywords": [
+        "cli-app",
+        "cli",
+        "bash",
+        ""
+    ],
+    "dependencies": {
+        "meow": "^3.7.0"
+    },
+    "devDependencies": {
+        "execa": "^0.9.0",
+        "opn": "^5.2.0",
+        "xo": "^0.18.2"
+    }
+}
