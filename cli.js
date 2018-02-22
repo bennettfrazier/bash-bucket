@@ -23,7 +23,7 @@ const meow = require('meow'),
       bb = require('.');
 
 // cli constants
-const help = require('./help'),
+const help = require('./help.js'),
       cli = meow(help.CONSOLE),
       command = cli.input[0],
       option1 = cli.input[1],
