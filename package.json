@@ -1,6 +1,6 @@
 {
     "name": "bash-bucket",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "Open repo in the browser straight from terminal",
     "license": "MIT",
     "repository": {
