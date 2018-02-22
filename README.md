@@ -99,4 +99,4 @@ $ bb repo
 ### Credit/inspiration:
 - [Open Bitbucket from Bash](http://hgtip.com/tips/advanced/2009-10-08-open-bitbucket-from-bash/) by [Steve Posh](http://stevelosh.com/)
 - [An introduction to useful bash aliases and functions](https://www.digitalocean.com/community/tutorials/an-introduction-to-useful-bash-aliases-and-functions) by Justin Ellingwood @ DigitalOcean
-- [gh-home by Sindre Sorhus](https://github.com/sindresorhus/gh-home/blob/master/cli.js)
+- [gh-home by Sindre Sorhus](https://github.com/sindresorhus/gh-home/)
