@@ -19,7 +19,8 @@ const meow = require('meow'),
       Bitbucket = 'bitbucket',
       Github = 'github',
       Git = 'git',
-      Hg = 'hg';
+      Hg = 'hg',
+      bb = require('.');
 
 // cli constants
 const help = require('./help'),
