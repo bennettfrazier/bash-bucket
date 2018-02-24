@@ -19,11 +19,10 @@ const meow = require('meow'),
       Bitbucket = 'bitbucket',
       Github = 'github',
       Git = 'git',
-      Hg = 'hg',
-      bb = require('.');
+      Hg = 'hg';
 
 // cli constants
-const help = require('./help.js'),
+const help = require('./help'),
       cli = meow(help.CONSOLE),
       command = cli.input[0],
       option1 = cli.input[1],
