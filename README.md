@@ -14,14 +14,8 @@ The purpose of bash-bucket is to efficiently open up current branch details thro
 ---------
 
 ## Installation
-
-To use these commands, simply clone the repo and change to it and `npm i -g` to make CLI available globally.
-
-### 1. Clone to your favorite dev directory, or download zip directly
 ```sh
-$ git clone https://github.com/bennettfrazier/bash-bucket.git
-$ cd ~/directory/to/cloned-repo/bash-bucket
-$ npm i -g # installs as global CLI
+$ npm i bash-bucket -g # installs as global CLI
 ```
 
 
