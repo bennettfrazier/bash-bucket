@@ -22,8 +22,23 @@ const meow = require('meow'),
       Hg = 'hg';
 
 // cli constants
-const help = require('./help'),
-      cli = meow(help.CONSOLE),
+const cli = meow(`
+    Usage: bb [command] [options]
+
+    Options:
+      --help
+      --v
+
+    Commands:
+
+      branch            go to branch
+      commits           go to commits on repo
+      compare [options] go to compare in browser
+      info              get branch and repo information
+      issues            go to issues in browser
+      pr                go to pr page for branch
+      repo              go to repo homepage
+`),
       command = cli.input[0],
       option1 = cli.input[1],
       option2 = cli.input[2];
