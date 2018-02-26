@@ -31,9 +31,9 @@ const cli = meow(`
 
     Commands:
 
-      branch            go to branch
+      branch [branch]   go to branch
       commits           go to commits on repo
-      compare [options] go to compare in browser
+      compare [branch]  go to compare in browser
       info              get branch and repo information
       issues            go to issues in browser
       pr                go to pr page for branch
@@ -50,6 +50,7 @@ var repo = '',
     repoUrl = '',
     branchType = '',
     branch = '',
+    branchToLog = '',
     url = '',
     printOpenUrlConsole = true,
     isValidRepo = false;
@@ -163,9 +164,8 @@ let cleanupRepoString = () => {
 
 
 let logInfo = () => {
-
-    if (command && branch) {
-        console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${command} > `) + chalk.blue.bgYellow.bold(` ${branch} `) + '\n');
+    if (command && branchToLog) {
+        console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${command} > `) + chalk.blue.bgYellow.bold(` ${branchToLog} `) + '\n');
     } else if (command) {
         console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${command} `) + '\n');
     } else {
@@ -197,10 +197,10 @@ let logInfo = () => {
 
 let getBranch = () => {
     // get branch
-    if (repoType == 'git') {
+    if (repoType == Git) {
         const gitBranch = execa.sync('git', ['rev-parse', '--abbrev-ref', 'HEAD']).stdout;
         branch = gitBranch;
-    } else if (repoType == 'hg') {
+    } else if (repoType == Hg) {
         const hgBranch = execa.sync('hg', ['branch']).stdout;
         branch = hgBranch;
     }
@@ -211,6 +211,7 @@ let getBranch = () => {
     } else if (repoPrefix == Bitbucket) {
         branchType = 'branch';
     }
+    branchToLog = branch;
     return branch;
 }
 
@@ -261,7 +262,14 @@ let setUrlForCommits = () => {
 
 let setUrlForBranch = () => {
     branch = getBranch();
-    url = `${repoUrl}${repo}/${branchType}/${branch}`;
+    url = `${repoUrl}${repo}/${branchType}/`;
+
+    if (option1) {
+        branchToLog = option1;
+        url += `${option1}`;
+    } else {
+        url += `${branch}`;
+    }
 }
 
 let setUrlForPR = () => {
