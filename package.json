@@ -16,13 +16,20 @@
   },
   "scripts": {},
   "files": [
-    "cli.js",
-    "help.js"
+    "cli.js"
   ],
   "keywords": [
     "cli-app",
     "cli",
-    "bash"
+    "bash",
+    "repository",
+    "terminal",
+    "browswer",
+    "github",
+    "bitbucket",
+    "vcs",
+    "git",
+    "mecurial"
   ],
   "dependencies": {
     "chalk": "^2.3.1",

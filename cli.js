@@ -51,7 +51,8 @@ var repo = '',
     branchType = '',
     branch = '',
     url = '',
-    printOpenUrlConsole = true;
+    printOpenUrlConsole = true,
+    isValidRepo = false;
 
 
 let runBB = () => {
@@ -98,12 +99,12 @@ let runBB = () => {
             url = `${repoUrl}${repo}`;
             printOpenUrlConsole = false;
         } else {
-            opn(url, {wait: false});
+            openRepoInBrowserIfValid();
         }
 
     } else {
         url = `${repoUrl}${repo}`;
-        opn(url, {wait: false});
+        openRepoInBrowserIfValid();
     }
 
     logInfo();
@@ -132,6 +133,12 @@ let tryHg = () => {
     repoType = Hg;
 }
 
+let openRepoInBrowserIfValid = () => {
+    isValidRepo = checkIsValidRepo();
+    if (isValidRepo) {
+        opn(url, {wait: false});
+    }
+}
 
 let determineRepoPrefix = () => {
     if (repo.includes(Bitbucket + '.org')) {
@@ -156,6 +163,7 @@ let cleanupRepoString = () => {
 
 
 let logInfo = () => {
+
     if (command && branch) {
         console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${command} > `) + chalk.blue.bgYellow.bold(` ${branch} `) + '\n');
     } else if (command) {
@@ -163,16 +171,21 @@ let logInfo = () => {
     } else {
         console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + '\n');
     }
-    console.log(bbPrefix + 'repo:          ' + chalk.blue.bold.underline(repo));
-    console.log(bbPrefix + 'repo type:     ' + chalk.blue.bold.underline(repoType));
-    console.log(bbPrefix + 'repo prefix:   ' + chalk.blue.bold.underline(repoPrefix));
-    if (branch) {
-        console.log(bbPrefix + 'branch:        ' + chalk.blue.bold.underline(branch));
-    }
-    if (printOpenUrlConsole) {
-        console.log(bbPrefix + 'opening url -> ' + chalk.blue.bold.underline(url));
+
+    if (isValidRepo) {
+        console.log(bbPrefix + 'repo:          ' + chalk.blue.bold.underline(repo));
+        console.log(bbPrefix + 'repo type:     ' + chalk.blue.bold.underline(repoType));
+        console.log(bbPrefix + 'repo prefix:   ' + chalk.blue.bold.underline(repoPrefix));
+        if (branch) {
+            console.log(bbPrefix + 'branch:        ' + chalk.blue.bold.underline(branch));
+        }
+        if (printOpenUrlConsole) {
+            console.log(bbPrefix + 'opening url -> ' + chalk.blue.bold.underline(url));
+        } else {
+            console.log(bbPrefix + 'repo home ->   ' + chalk.blue.bold.underline(url));
+        }
     } else {
-        console.log(bbPrefix + 'repo home ->   ' + chalk.blue.bold.underline(url));
+        console.log(bbPrefix + 'No repository found for this directory -> ', chalk.blue.bold.underline(process.cwd()));
     }
     console.log();
 }
@@ -199,6 +212,12 @@ let getBranch = () => {
         branchType = 'branch';
     }
     return branch;
+}
+
+let checkIsValidRepo = () => {
+    if (repo) {
+        return true;
+    }
 }
 
 
