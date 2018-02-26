@@ -32,7 +32,7 @@ All commands are fully explained below ⬇️
 Open current branch in browser
 ``` sh
 $ cd directory/to/current-project
-$ bb branch
+$ bb branch [branch] # open specific branch as optional parameter rather than current
 ```
 
 ### `commits`
