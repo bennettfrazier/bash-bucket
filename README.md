@@ -4,8 +4,8 @@ Bash Bucket is a command line interface to open repositories, branches, and pull
 <br>
 <div align="center">
 <img src='https://raw.githubusercontent.com/bennettfrazier/bash-bucket/master/media/bash-bucket.gif'>
-<br>
 </div>
+<br>
 
 The purpose of bash-bucket is to efficiently open up current branch details through the terminal window:
 - `$ bb` - open repo in browser
