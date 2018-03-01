@@ -32,7 +32,7 @@ const cli = meow(`
     Commands:
 
       branch [branch]   go to branch
-      commits           go to commits on repo
+      commits [branch]  go to commits on repo
       compare [branch]  go to compare in browser
       info              get branch and repo information
       issues            go to issues in browser
@@ -102,6 +102,9 @@ let runBB = () => {
         } else if (command == 'pr' || command == 'p') {
             commandName = 'pull request';
             setUrlForPR();
+        } else if (command == 'repo' || command == 'r') {
+            commandName = 'repository'
+            url = `${repoUrl}${repo}`;
         } else if (command == 'info' || command == 'in') {
             commandName = 'information';
             url = `${repoUrl}${repo}`;
@@ -272,10 +275,16 @@ let setUrlForCompare = () => {
 }
 let setUrlForCommits = () => {
     branch = getBranch();
+    var commitBranch = branch;
+
+    if (option1) {
+        commitBranch = option1;
+    }
+
     if (repoPrefix == Github) {
-        url =  `${repoUrl}${repo}/commits/${branch}`;
+        url =  `${repoUrl}${repo}/commits/${commitBranch}`;
     } else if (repoPrefix == Bitbucket) {
-        url = `${repoUrl}${repo}/commits/${branchType}/${branch}`;
+        url = `${repoUrl}${repo}/commits/${branchType}/${commitBranch}`;
     }
 }
 
