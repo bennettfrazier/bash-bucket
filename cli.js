@@ -26,8 +26,8 @@ const cli = meow(`
     Usage: bb [command] [options]
 
     Options:
-      --help
-      --v
+      --help, -h
+      --v, -v
 
     Commands:
 
@@ -38,7 +38,7 @@ const cli = meow(`
       issues            go to issues in browser
       pr                go to pr page for branch
       repo              go to repo homepage
-`),
+`,    { alias: {  h: 'help', v: 'version'}}),
       command = cli.input[0],
       option1 = cli.input[1],
       option2 = cli.input[2];
@@ -51,8 +51,10 @@ var repo = '',
     branchType = '',
     branch = '',
     branchToLog = '',
+    commandName = '',
     url = '',
-    printOpenUrlConsole = true,
+    preventOpenUrl = false,
+    isValidCommand = false,
     isValidRepo = false;
 
 
@@ -73,38 +75,49 @@ let runBB = () => {
 
     // run through cli commands
     if (command) {
-        switch (command) {
-            case 'branch':
-                setUrlForBranch();
-                break;
-            case 'commits':
-                setUrlForCommits();
-                break;
-            case 'compare':
-                setUrlForCompare();
-                break;
-            case 'issues':
-                setUrlForIssues();
-                break;
-            case 'pr':
-                setUrlForPR();
-                break;
-            case 'repo':
-                url = `${repoUrl}${repo}`;
-                break;
-            default:
+        // TODO: clean up alternate way to check if valid
+        if (   command == 'branch' || command == 'b'
+        || command == 'commits' || command == 'comm'
+        || command == 'compare' || command == 'comp'
+        || command == 'issues' || command == 'is'
+        || command == 'pr' || command == 'p'
+        || command == 'repo' || command == 'r'
+        || command == 'info' || command == 'in' ) {
+            isValidCommand = true;
         }
 
-        // TODO cleanup --> open url except on info
-        if (command == 'info' || command == 'i') {
+        // checks list of commands to set url
+        if (command == 'branch' || command == 'b') {
+            commandName = 'branch';
+            setUrlForBranch();
+        } else if (command == 'commits' || command == 'comm') {
+            commandName = 'commits';
+            setUrlForCommits();
+        } else if (command == 'compare' || command == 'comp') {
+            commandName = 'compare';
+            setUrlForCompare();
+        } else if (command == 'issues' || command == 'is') {
+            commandName = 'issues';
+            setUrlForIssues();
+        } else if (command == 'pr' || command == 'p') {
+            commandName = 'pull request';
+            setUrlForPR();
+        } else if (command == 'info' || command == 'in') {
+            commandName = 'information';
             url = `${repoUrl}${repo}`;
-            printOpenUrlConsole = false;
+            preventOpenUrl = true;
         } else {
-            openRepoInBrowserIfValid();
+            // help fallback
+            cli.showHelp([2]);
         }
+
+        openRepoInBrowserIfValid();
 
     } else {
+        // defaults to `bb repo`
+        commandName = 'repository';
         url = `${repoUrl}${repo}`;
+        isValidCommand = true;
         openRepoInBrowserIfValid();
     }
 
@@ -136,8 +149,12 @@ let tryHg = () => {
 
 let openRepoInBrowserIfValid = () => {
     isValidRepo = checkIsValidRepo();
-    if (isValidRepo) {
-        opn(url, {wait: false});
+
+    if (isValidRepo && isValidCommand && !preventOpenUrl) {
+        // delay open browser 0.3sec to see output before browser takes over
+        setTimeout(function(){
+            opn(url, {wait: false});
+        },300);
     }
 }
 
@@ -165,25 +182,27 @@ let cleanupRepoString = () => {
 
 let logInfo = () => {
     if (command && branchToLog) {
-        console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${command} > `) + chalk.blue.bgYellow.bold(` ${branchToLog} `) + '\n');
+        console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${commandName} > `) + chalk.blue.bgYellow.bold(` ${branchToLog} `) + '\n');
     } else if (command) {
-        console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${command} `) + '\n');
+        console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + ' ' + chalk.yellow.bgBlue.bold(` ${commandName} `) + '\n');
     } else {
         console.log('\n' + chalk.yellow.bold('[Bash Bucket]') + '\n');
     }
 
-    if (isValidRepo) {
+    if (isValidRepo && isValidCommand) {
         console.log(bbPrefix + 'repo:          ' + chalk.blue.bold.underline(repo));
         console.log(bbPrefix + 'repo type:     ' + chalk.blue.bold.underline(repoType));
         console.log(bbPrefix + 'repo prefix:   ' + chalk.blue.bold.underline(repoPrefix));
         if (branch) {
             console.log(bbPrefix + 'branch:        ' + chalk.blue.bold.underline(branch));
         }
-        if (printOpenUrlConsole) {
-            console.log(bbPrefix + 'opening url -> ' + chalk.blue.bold.underline(url));
-        } else {
+        if (preventOpenUrl) {
             console.log(bbPrefix + 'repo home ->   ' + chalk.blue.bold.underline(url));
+        } else {
+            console.log(bbPrefix + 'opening url -> ' + chalk.blue.bold.underline(url));
         }
+    } else if (!isValidCommand) {
+        console.log(bbPrefix + 'Not a valid command, see `bb --help` for options.');
     } else {
         console.log(bbPrefix + 'No repository found for this directory -> ', chalk.blue.bold.underline(process.cwd()));
     }
