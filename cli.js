@@ -36,6 +36,7 @@ const cli = meow(`
       compare [branch]  go to compare in browser
       info              get branch and repo information
       issues            go to issues in browser
+      pipelines         go to pipelines page
       pr                go to pr page for branch
       repo              go to repo homepage
 `,    { alias: {  h: 'help', v: 'version'}}),
@@ -99,7 +100,10 @@ let runBB = () => {
         } else if (command == 'issues' || command == 'is') {
             commandName = 'issues';
             setUrlForIssues();
-        } else if (command == 'pr' || command == 'p') {
+        } else if (command == 'pipelines' || command == 'pipeline' || command == 'pipe' || command == 'p') {
+            commandName = 'pipelines';
+            setUrlForPipeline();
+        } else if (command == 'pr') {
             commandName = 'pull request';
             setUrlForPR();
         } else if (command == 'repo' || command == 'r') {
@@ -311,6 +315,10 @@ let setUrlForPR = () => {
 
 let setUrlForIssues = () => {
     url =  `${repoUrl}${repo}/issues`;
+}
+
+let setUrlForPipeline = () => {
+    url =  `${repoUrl}${repo}/addon/pipelines/`;
 }
 
 runBB(); // runs bash bucket cli
