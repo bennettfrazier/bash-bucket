@@ -19,7 +19,7 @@ The purpose of bash-bucket is to efficiently open up current branch details thro
 
 ---------
 
-## Installation
+## Installation on [NPM](https://www.npmjs.com/package/bash-bucket)
 ```sh
 $ npm i bash-bucket -g # installs as global CLI
 ```
